@@ -8,10 +8,12 @@
         :root {
             --primary: #0f172a;
             --accent: #2563eb;
+            --accent-hover: #1d4ed8;
             --success: #16a34a;
             --danger: #dc2626;
-            --bg: #f1f5f9;
+            --bg: #f8fafc;
             --card: #ffffff;
+            --border: #e2e8f0;
         }
 
         body {
@@ -20,36 +22,38 @@
             margin: 0;
             padding: 20px;
             color: #333;
+            line-height: 1.5;
         }
 
-       .container {
-            max-width: 600px;
+        .container {
+            max-width: 500px;
             margin: 0 auto;
             background: var(--card);
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
             overflow: hidden;
+            border: 1px solid var(--border);
         }
 
-       .header {
+        .header {
             background: var(--primary);
             color: white;
-            padding: 20px;
+            padding: 24px;
             text-align: center;
         }
 
-       .header h2 { margin: 0; font-size: 1.4rem; }
-       .header p { margin: 5px 0 0; font-size: 0.8rem; opacity: 0.8; }
+        .header h2 { margin: 0; font-size: 1.5rem; letter-spacing: -0.025em; }
+        .header p { margin: 8px 0 0; font-size: 0.875rem; opacity: 0.8; }
 
-       .content { padding: 20px; }
+        .content { padding: 24px; }
 
-       .input-group { margin-bottom: 15px; }
+        .input-group { margin-bottom: 16px; }
         
         label {
             display: block;
             font-weight: 600;
-            margin-bottom: 5px;
-            font-size: 0.9rem;
+            margin-bottom: 6px;
+            font-size: 0.875rem;
             color: #475569;
         }
 
@@ -60,88 +64,122 @@
             border-radius: 8px;
             font-size: 1rem;
             box-sizing: border-box;
+            transition: border-color 0.2s;
         }
 
-       .btn {
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn {
             width: 100%;
-            padding: 15px;
+            padding: 16px;
             background-color: var(--accent);
             color: white;
             border: none;
             border-radius: 8px;
             font-size: 1rem;
-            font-weight: bold;
+            font-weight: 700;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 12px;
+            transition: background-color 0.2s;
         }
 
-       .btn:active { transform: scale(0.98); }
+        .btn:hover { background-color: var(--accent-hover); }
+        .btn:active { transform: scale(0.98); }
 
-       .result-box {
-            margin-top: 25px;
+        .result-box {
+            margin-top: 24px;
             padding: 20px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            display: none; /* Escondido inicialmente */
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            display: none;
+            animation: fadeIn 0.3s ease-out;
         }
 
-       .result-row {
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             font-size: 0.95rem;
+            color: #334155;
         }
 
-       .total-row {
+        .total-row {
             font-weight: 800;
-            font-size: 1.2rem;
+            font-size: 1.25rem;
             color: var(--primary);
             border-top: 2px solid #cbd5e1;
-            padding-top: 10px;
-            margin-top: 10px;
+            padding-top: 16px;
+            margin-top: 16px;
         }
 
-       .status {
+        .status {
             text-align: center;
-            padding: 8px;
-            border-radius: 5px;
+            padding: 12px;
+            border-radius: 8px;
             color: white;
             font-weight: bold;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
-       .viavel { background-color: var(--success); }
-       .inviavel { background-color: var(--danger); }
+        
+        .viavel { background-color: var(--success); }
+        .inviavel { background-color: var(--danger); }
 
-       .whatsapp-area {
-            margin-top: 20px;
-            border-top: 1px dashed #ccc;
-            padding-top: 15px;
+        .whatsapp-area {
+            margin-top: 24px;
+            border-top: 1px dashed #94a3b8;
+            padding-top: 20px;
         }
 
         textarea {
             width: 100%;
-            height: 120px;
+            height: 140px;
             border: 1px solid #cbd5e1;
             border-radius: 8px;
-            padding: 10px;
+            padding: 12px;
             font-family: monospace;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             box-sizing: border-box;
+            background: white;
+            resize: none;
+            margin-bottom: 10px;
         }
 
-       .copy-btn {
+        .copy-btn {
             background-color: #25D366;
             color: white;
             border: none;
-            padding: 8px;
-            border-radius: 5px;
+            padding: 12px;
+            border-radius: 8px;
             width: 100%;
-            margin-top: 5px;
             cursor: pointer;
             font-weight: bold;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
+        
+        .copy-btn:hover { background-color: #1ebc57; }
 
+        /* Mobile Fixes */
+        @media (max-width: 480px) {
+            body { padding: 10px; }
+            .container { border-radius: 12px; }
+        }
     </style>
 </head>
 <body>
@@ -149,38 +187,38 @@
 <div class="container">
     <div class="header">
         <h2>SAVA - Calculadora Auto</h2>
-        <p>Análise de Viabilidade de Veículo com Dívida</p>
+        <p>Análise de Viabilidade (Dívida x FIPE)</p>
     </div>
 
     <div class="content">
         <div class="input-group">
-            <label>Modelo do Veículo</label>
-            <input type="text" id="modelo" placeholder="Ex: Corolla 2020">
+            <label for="modelo">Modelo do Veículo</label>
+            <input type="text" id="modelo" placeholder="Ex: Honda Civic 2021">
         </div>
 
         <div class="input-group">
-            <label>Valor FIPE (R$)</label>
-            <input type="number" id="fipe" placeholder="0.00">
+            <label for="fipe">Valor FIPE (R$)</label>
+            <input type="number" id="fipe" placeholder="0.00" inputmode="decimal" step="0.01">
         </div>
 
         <div class="input-group">
-            <label>Valor para Quitação Total (Hoje)</label>
-            <input type="number" id="quitacao" placeholder="0.00">
+            <label for="quitacao">Valor Quitação Total (Hoje)</label>
+            <input type="number" id="quitacao" placeholder="0.00" inputmode="decimal" step="0.01">
         </div>
 
         <div class="input-group">
-            <label>Débitos (IPVA/Multas/Pátio)</label>
-            <input type="number" id="debitos" placeholder="0.00">
+            <label for="debitos">Débitos (IPVA/Multas/Pátio)</label>
+            <input type="number" id="debitos" placeholder="0.00" inputmode="decimal" step="0.01">
         </div>
 
         <div class="input-group">
-            <label>Custo de Reparos/Pneus (R$)</label>
-            <input type="number" id="reparos" placeholder="0.00">
+            <label for="reparos">Custo de Reparos/Pneus (R$)</label>
+            <input type="number" id="reparos" placeholder="0.00" inputmode="decimal" step="0.01">
         </div>
 
         <div class="input-group">
-            <label>Sua Margem de Lucro Desejada (%)</label>
-            <input type="number" id="margem" value="15" placeholder="15">
+            <label for="margem">Sua Margem de Lucro Desejada (%)</label>
+            <input type="number" id="margem" value="15" placeholder="15" inputmode="numeric">
         </div>
 
         <button class="btn" onclick="calcular()">CALCULAR OFERTA</button>
@@ -210,59 +248,53 @@
             </div>
 
             <div class="result-row total-row">
-                <span>PAGAR AO CLIENTE (PIX):</span>
+                <span>OFERTA AO CLIENTE:</span>
                 <span id="valOferta">R$ 0,00</span>
             </div>
 
             <div id="areaZap" class="whatsapp-area">
-                <label>Script para Copiar:</label>
+                <label style="margin-bottom: 8px; display:block;">Script para Copiar:</label>
                 <textarea id="textoZap" readonly></textarea>
-                <button class="copy-btn" onclick="copiar()">Copiar Texto</button>
+                <button class="copy-btn" onclick="copiar()">
+                    Copiar Texto
+                </button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
+    // Função auxiliar para formatar moeda BRL
     function formatarMoeda(valor) {
         return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     }
 
     function calcular() {
-        // 1. Pegar valores (usando 0 se estiver vazio)
-        let modelo = document.getElementById('modelo').value |
+        // CORREÇÃO: Uso correto do operador lógico || para definir valores padrão
+        let modelo = document.getElementById('modelo').value || "Veículo";
+        
+        // Convertendo inputs para float, garantindo 0 se estiver vazio
+        let fipe = parseFloat(document.getElementById('fipe').value) || 0;
+        let quitacao = parseFloat(document.getElementById('quitacao').value) || 0;
+        let debitos = parseFloat(document.getElementById('debitos').value) || 0;
+        let reparos = parseFloat(document.getElementById('reparos').value) || 0;
+        let margemPerc = parseFloat(document.getElementById('margem').value) || 15;
 
-| "Veículo";
-        let fipe = parseFloat(document.getElementById('fipe').value) |
+        // Parâmetros Fixos
+        const CUSTO_FIXO = 1500.00; // Transferência, vistoria, gasolina, despachante
+        const FATOR_VENDA = 0.90;   // Projetando venda a 90% da FIPE para liquidez rápida
 
-| 0;
-        let quitacao = parseFloat(document.getElementById('quitacao').value) |
-
-| 0;
-        let debitos = parseFloat(document.getElementById('debitos').value) |
-
-| 0;
-        let reparos = parseFloat(document.getElementById('reparos').value) |
-
-| 0;
-        let margemPerc = parseFloat(document.getElementById('margem').value) |
-
-| 15;
-
-        // 2. Parâmetros Fixos
-        const CUSTO_FIXO = 1500.00; // Transferência, vistoria, gasolina
-        const FATOR_VENDA = 0.90;   // Vender a 90% da FIPE para ter liquidez
-
-        // 3. Cálculos
+        // Cálculos
         let vendaProjetada = fipe * FATOR_VENDA;
         let lucroMeta = vendaProjetada * (margemPerc / 100);
         let custosTotais = quitacao + debitos + reparos + CUSTO_FIXO;
         
-        // A conta mágica: O que sobra é do cliente
+        // Cálculo final da oferta (O que sobra é do cliente)
         let ofertaCliente = vendaProjetada - custosTotais - lucroMeta;
 
-        // 4. Exibir na tela
+        // Exibir resultados
         document.getElementById('resultado').style.display = 'block';
+        
         document.getElementById('valVenda').innerText = formatarMoeda(vendaProjetada);
         document.getElementById('valQuitacao').innerText = "- " + formatarMoeda(quitacao);
         document.getElementById('valDebitos').innerText = "- " + formatarMoeda(debitos + reparos);
@@ -273,7 +305,7 @@
         let areaZap = document.getElementById('areaZap');
 
         if (ofertaCliente > 0) {
-            // Cenário Positivo
+            // Cenário Positivo (Viável)
             elStatus.innerText = "✅ APROVADO PARA COMPRA";
             elStatus.className = "status viavel";
             elOferta.innerText = formatarMoeda(ofertaCliente);
@@ -282,31 +314,48 @@
 
             // Gerar Script
             let texto = `*PROPOSTA DE COMPRA - ${modelo.toUpperCase()}*\n\n`;
-            texto += `Olá! Analisamos seu veículo e conseguimos aprovar a seguinte operação para resolver a pendência hoje:\n\n`;
-            texto += `1. Pagamos a Quitação à vista no Banco: ${formatarMoeda(quitacao)}\n`;
-            texto += `2. Assumimos todos os débitos e documentação.\n`;
-            texto += `3. *Você recebe no PIX:* ${formatarMoeda(ofertaCliente)}\n\n`;
-            texto += `Você se livra da dívida total de ${formatarMoeda(quitacao + debitos)} e limpa seu nome imediatamente.\n`;
-            texto += `Podemos agendar no cartório?`;
+            texto += `Olá! Analisamos seu veículo e conseguimos aprovar a operação para resolver a pendência hoje:\n\n`;
+            texto += `💰 *Nossa Proposta:* Pagamos a Quitação à vista (${formatarMoeda(quitacao)}) + Assumimos débitos.\n`;
+            texto += `✅ *Você recebe no PIX:* ${formatarMoeda(ofertaCliente)}\n\n`;
+            texto += `Total da dívida eliminada: ${formatarMoeda(quitacao + debitos)}\n`;
+            texto += `Podemos agendar no cartório para formalizar?`;
             
             document.getElementById('textoZap').value = texto;
 
         } else {
-            // Cenário Negativo
-            elStatus.innerText = "⛔ INVIÁVEL (Dívida maior que o valor)";
+            // Cenário Negativo (Inviável)
+            // Se der negativo, a oferta é ZERO, pois não há margem para pagar o cliente
+            elStatus.innerText = "⛔ INVIÁVEL (Dívida Alta)";
             elStatus.className = "status inviavel";
-            elOferta.innerText = "R$ 0,00 (Negativo: " + formatarMoeda(ofertaCliente) + ")";
+            elOferta.innerText = "Sem oferta (" + formatarMoeda(ofertaCliente) + ")";
             elOferta.style.color = "#dc2626"; // Vermelho
+            
+            // Esconde área do script, pois não há oferta
             areaZap.style.display = "none";
         }
     }
 
     function copiar() {
-        let texto = document.getElementById('textoZap');
-        texto.select();
-        texto.setSelectionRange(0, 99999); /* Mobile */
-        navigator.clipboard.writeText(texto.value);
-        alert("Texto copiado!");
+        let textarea = document.getElementById('textoZap');
+        textarea.select();
+        textarea.setSelectionRange(0, 99999); // Para mobile
+
+        try {
+            // Método mais compatível com iframes e browsers antigos/restritos
+            var successful = document.execCommand('copy');
+            var msg = successful ? 'Copiado com sucesso!' : 'Erro ao copiar';
+            
+            // Feedback visual simples no botão
+            let btn = document.querySelector('.copy-btn');
+            let originalText = btn.innerText;
+            btn.innerText = "Copiado! ✅";
+            setTimeout(() => {
+                btn.innerText = originalText;
+            }, 2000);
+            
+        } catch (err) {
+            alert('Não foi possível copiar automaticamente. Por favor selecione e copie manualmente.');
+        }
     }
 </script>
 
