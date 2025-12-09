@@ -3,172 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAVA - Sistema de Análise de Viabilidade</title>
+    <title>SAVA 3.0 - Calculadora de Viabilidade</title>
     <style>
         :root {
             --primary: #0f172a;
             --accent: #2563eb;
             --success: #16a34a;
             --danger: #dc2626;
-            --bg: #f8fafc;
+            --bg: #f1f5f9;
             --card: #ffffff;
         }
 
         body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg);
-            color: var(--primary);
             margin: 0;
             padding: 20px;
-            line-height: 1.5;
+            color: #333;
         }
 
        .container {
-            max-width: 800px;
+            max-width: 600px;
             margin: 0 auto;
             background: var(--card);
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             overflow: hidden;
         }
 
        .header {
             background: var(--primary);
             color: white;
-            padding: 24px;
+            padding: 20px;
             text-align: center;
         }
 
-       .header h1 { margin: 0; font-size: 1.5rem; }
-       .header p { margin: 8px 0 0; opacity: 0.8; font-size: 0.9rem; }
+       .header h2 { margin: 0; font-size: 1.4rem; }
+       .header p { margin: 5px 0 0; font-size: 0.8rem; opacity: 0.8; }
 
-       .content { padding: 24px; }
+       .content { padding: 20px; }
 
-       .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        @media (max-width: 600px) {
-           .grid { grid-template-columns: 1fr; }
-        }
-
-       .form-group { margin-bottom: 16px; }
+       .input-group { margin-bottom: 15px; }
         
         label {
             display: block;
             font-weight: 600;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
             font-size: 0.9rem;
+            color: #475569;
         }
 
         input {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #cbd5e1;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 1rem;
             box-sizing: border-box;
         }
 
-        input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
        .btn {
-            display: block;
             width: 100%;
-            background: var(--accent);
+            padding: 15px;
+            background-color: var(--accent);
             color: white;
             border: none;
-            padding: 14px;
+            border-radius: 8px;
             font-size: 1rem;
             font-weight: bold;
-            border-radius: 8px;
             cursor: pointer;
-            transition: background 0.2s;
             margin-top: 10px;
         }
 
-       .btn:hover { background: #1d4ed8; }
+       .btn:active { transform: scale(0.98); }
 
-       .results {
-            margin-top: 30px;
+       .result-box {
+            margin-top: 25px;
             padding: 20px;
-            background: #f1f5f9;
-            border-radius: 8px;
-            display: none; /* Hidden by default */
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            display: none; /* Escondido inicialmente */
         }
-
-       .status-badge {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 20px;
-            color: white;
-            font-weight: bold;
-            font-size: 0.9rem;
-            margin-bottom: 15px;
-        }
-
-       .status-green { background-color: var(--success); }
-       .status-red { background-color: var(--danger); }
 
        .result-row {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-       .result-row.highlight {
-            font-weight: bold;
-            font-size: 1.1rem;
-            color: var(--primary);
-            border-bottom: 2px solid var(--primary);
-        }
-
-       .whatsapp-box {
-            margin-top: 25px;
-            background: #dcf8c6;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #bbf7d0;
-            position: relative;
-        }
-
-       .whatsapp-title {
-            font-weight: bold;
-            color: #075e54;
             margin-bottom: 10px;
-            display: block;
+            font-size: 0.95rem;
+        }
+
+       .total-row {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: var(--primary);
+            border-top: 2px solid #cbd5e1;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+
+       .status {
+            text-align: center;
+            padding: 8px;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+       .viavel { background-color: var(--success); }
+       .inviavel { background-color: var(--danger); }
+
+       .whatsapp-area {
+            margin-top: 20px;
+            border-top: 1px dashed #ccc;
+            padding-top: 15px;
         }
 
         textarea {
             width: 100%;
-            height: 150px;
-            border: 1px solid #a3cfbb;
-            border-radius: 6px;
+            height: 120px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
             padding: 10px;
             font-family: monospace;
-            font-size: 0.9rem;
-            resize: vertical;
+            font-size: 0.85rem;
+            box-sizing: border-box;
         }
 
        .copy-btn {
-            background: #25D366;
+            background-color: #25D366;
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
+            padding: 8px;
+            border-radius: 5px;
+            width: 100%;
+            margin-top: 5px;
             cursor: pointer;
             font-weight: bold;
-            margin-top: 8px;
         }
-        
-       .copy-btn:hover { background: #128C7E; }
 
     </style>
 </head>
@@ -176,91 +148,89 @@
 
 <div class="container">
     <div class="header">
-        <h1>SAVA 2.0</h1>
-        <p>Sistema de Análise de Viabilidade de Ativos (Automotivo)</p>
+        <h2>SAVA - Calculadora Auto</h2>
+        <p>Análise de Viabilidade de Veículo com Dívida</p>
     </div>
 
     <div class="content">
-        <div class="grid">
-            <div class="form-group">
-                <label>Modelo do Veículo</label>
-                <input type="text" id="veiculo" placeholder="Ex: Honda Civic 2020">
-            </div>
-            <div class="form-group">
-                <label>Valor FIPE (R$)</label>
-                <input type="number" id="fipe" placeholder="0.00">
-            </div>
+        <div class="input-group">
+            <label>Modelo do Veículo</label>
+            <input type="text" id="modelo" placeholder="Ex: Corolla 2020">
         </div>
 
-        <div class="grid">
-            <div class="form-group">
-                <label>Valor Quitação Total (R$)</label>
-                <input type="number" id="quitacao" placeholder="Valor do boleto hoje">
-            </div>
-            <div class="form-group">
-                <label>Débitos DETRAN (IPVA/Multas)</label>
-                <input type="number" id="debitos" placeholder="0.00">
-            </div>
+        <div class="input-group">
+            <label>Valor FIPE (R$)</label>
+            <input type="number" id="fipe" placeholder="0.00">
         </div>
 
-        <div class="grid">
-            <div class="form-group">
-                <label>Reparos Necessários (R$)</label>
-                <input type="number" id="reparos" placeholder="Mecânica, Pneus, Funilaria">
-            </div>
-            <div class="form-group">
-                <label>Margem de Lucro Desejada (%)</label>
-                <input type="number" id="margem" value="15" placeholder="15">
-            </div>
+        <div class="input-group">
+            <label>Valor para Quitação Total (Hoje)</label>
+            <input type="number" id="quitacao" placeholder="0.00">
         </div>
 
-        <button class="btn" onclick="calcularViabilidade()">ANALISAR VIABILIDADE</button>
+        <div class="input-group">
+            <label>Débitos (IPVA/Multas/Pátio)</label>
+            <input type="number" id="debitos" placeholder="0.00">
+        </div>
 
-        <div id="resultsArea" class="results">
-            <div id="statusBadge" class="status-badge"></div>
-            
+        <div class="input-group">
+            <label>Custo de Reparos/Pneus (R$)</label>
+            <input type="number" id="reparos" placeholder="0.00">
+        </div>
+
+        <div class="input-group">
+            <label>Sua Margem de Lucro Desejada (%)</label>
+            <input type="number" id="margem" value="15" placeholder="15">
+        </div>
+
+        <button class="btn" onclick="calcular()">CALCULAR OFERTA</button>
+
+        <div id="resultado" class="result-box">
+            <div id="statusMsg" class="status"></div>
+
             <div class="result-row">
-                <span>Venda Projetada (90% FIPE):</span>
-                <span id="resVenda">R$ 0,00</span>
+                <span>Venda Rápida (90% FIPE):</span>
+                <span id="valVenda">R$ 0,00</span>
             </div>
             <div class="result-row">
-                <span>Custo Total (Quitação + Débitos + Reparos + Taxas):</span>
-                <span id="resCusto">R$ 0,00</span>
+                <span>(-) Quitação Banco:</span>
+                <span id="valQuitacao" style="color: #dc2626;">R$ 0,00</span>
             </div>
             <div class="result-row">
-                <span>Seu Lucro Projetado:</span>
-                <span id="resLucro" style="color: var(--success); font-weight: bold;">R$ 0,00</span>
+                <span>(-) Débitos/Reparos:</span>
+                <span id="valDebitos" style="color: #dc2626;">R$ 0,00</span>
             </div>
-            <div class="result-row highlight">
-                <span>OFERTA MÁXIMA AO CLIENTE:</span>
-                <span id="resOferta">R$ 0,00</span>
+            <div class="result-row">
+                <span>(-) Custo Operacional Fixo:</span>
+                <span style="color: #dc2626;">R$ 1.500,00</span>
+            </div>
+            <div class="result-row">
+                <span>(-) Seu Lucro Meta:</span>
+                <span id="valLucro" style="color: #2563eb; font-weight:bold;">R$ 0,00</span>
             </div>
 
-            <div id="whatsappSection" class="whatsapp-box">
-                <span class="whatsapp-title">📱 Script de Proposta para WhatsApp</span>
-                <textarea id="whatsappText" readonly></textarea>
-                <button class="copy-btn" onclick="copiarTexto()">Copiar Texto</button>
+            <div class="result-row total-row">
+                <span>PAGAR AO CLIENTE (PIX):</span>
+                <span id="valOferta">R$ 0,00</span>
             </div>
-            
-            <div id="alertSection" style="margin-top: 15px; color: var(--danger); font-weight: bold; display: none;">
-                ⚠️ OPERAÇÃO DE RISCO: O passivo supera o valor de mercado. Não compre este carro a menos que o cliente pague a diferença.
+
+            <div id="areaZap" class="whatsapp-area">
+                <label>Script para Copiar:</label>
+                <textarea id="textoZap" readonly></textarea>
+                <button class="copy-btn" onclick="copiar()">Copiar Texto</button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    // Configurações Fixas
-    const CUSTO_OPERACIONAL = 1500.00; // Cartório, Despachante, Vistoria
-    const FATOR_VENDA_RAPIDA = 0.90;   // Vender a 90% da FIPE para girar rápido
-
-    function formatCurrency(value) {
-        return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    function formatarMoeda(valor) {
+        return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     }
 
-    function calcularViabilidade() {
-        // Coleta de dados
-        let veiculo = document.getElementById('veiculo').value |
+    function calcular() {
+        // 1. Pegar valores (usando 0 se estiver vazio)
+        let modelo = document.getElementById('modelo').value |
 
 | "Veículo";
         let fipe = parseFloat(document.getElementById('fipe').value) |
@@ -279,64 +249,66 @@
 
 | 15;
 
-        // Cálculos (Matemática Reversa)
-        let valorVendaProjetado = fipe * FATOR_VENDA_RAPIDA;
-        let lucroMeta = valorVendaProjetado * (margemPerc / 100);
-        let custosFixos = quitacao + debitos + reparos + CUSTO_OPERACIONAL;
+        // 2. Parâmetros Fixos
+        const CUSTO_FIXO = 1500.00; // Transferência, vistoria, gasolina
+        const FATOR_VENDA = 0.90;   // Vender a 90% da FIPE para ter liquidez
+
+        // 3. Cálculos
+        let vendaProjetada = fipe * FATOR_VENDA;
+        let lucroMeta = vendaProjetada * (margemPerc / 100);
+        let custosTotais = quitacao + debitos + reparos + CUSTO_FIXO;
         
-        // A mágica: Quanto sobra pro cliente depois de eu tirar meu lucro e pagar tudo?
-        let tetoPagamentoCliente = valorVendaProjetado - (custosFixos + lucroMeta);
+        // A conta mágica: O que sobra é do cliente
+        let ofertaCliente = vendaProjetada - custosTotais - lucroMeta;
 
-        // Exibição
-        document.getElementById('resultsArea').style.display = 'block';
+        // 4. Exibir na tela
+        document.getElementById('resultado').style.display = 'block';
+        document.getElementById('valVenda').innerText = formatarMoeda(vendaProjetada);
+        document.getElementById('valQuitacao').innerText = "- " + formatarMoeda(quitacao);
+        document.getElementById('valDebitos').innerText = "- " + formatarMoeda(debitos + reparos);
+        document.getElementById('valLucro').innerText = "- " + formatarMoeda(lucroMeta);
         
-        let statusBadge = document.getElementById('statusBadge');
-        let whatsappSec = document.getElementById('whatsappSection');
-        let alertSec = document.getElementById('alertSection');
+        let elStatus = document.getElementById('statusMsg');
+        let elOferta = document.getElementById('valOferta');
+        let areaZap = document.getElementById('areaZap');
 
-        // Popula valores na tela
-        document.getElementById('resVenda').innerText = formatCurrency(valorVendaProjetado);
-        document.getElementById('resCusto').innerText = formatCurrency(custosFixos + CUSTO_OPERACIONAL); // Apenas visual
-        document.getElementById('resLucro').innerText = formatCurrency(lucroMeta);
-        document.getElementById('resOferta').innerText = formatCurrency(tetoPagamentoCliente);
+        if (ofertaCliente > 0) {
+            // Cenário Positivo
+            elStatus.innerText = "✅ APROVADO PARA COMPRA";
+            elStatus.className = "status viavel";
+            elOferta.innerText = formatarMoeda(ofertaCliente);
+            elOferta.style.color = "#16a34a"; // Verde
+            areaZap.style.display = "block";
 
-        if (tetoPagamentoCliente > 0) {
-            // Cenário Viável
-            statusBadge.className = 'status-badge status-green';
-            statusBadge.innerText = '✅ NEGÓCIO VIÁVEL';
-            whatsappSec.style.display = 'block';
-            alertSec.style.display = 'none';
+            // Gerar Script
+            let texto = `*PROPOSTA DE COMPRA - ${modelo.toUpperCase()}*\n\n`;
+            texto += `Olá! Analisamos seu veículo e conseguimos aprovar a seguinte operação para resolver a pendência hoje:\n\n`;
+            texto += `1. Pagamos a Quitação à vista no Banco: ${formatarMoeda(quitacao)}\n`;
+            texto += `2. Assumimos todos os débitos e documentação.\n`;
+            texto += `3. *Você recebe no PIX:* ${formatarMoeda(ofertaCliente)}\n\n`;
+            texto += `Você se livra da dívida total de ${formatarMoeda(quitacao + debitos)} e limpa seu nome imediatamente.\n`;
+            texto += `Podemos agendar no cartório?`;
             
-            // Gera Texto
-            let script = `*PROPOSTA DE COMPRA - ${veiculo.toUpperCase()}*\n\n`;
-            script += `Olá! Fizemos a análise jurídica e financeira do seu caso.\n\n`;
-            script += `Para resolvermos a pendência no banco *hoje* e evitar o leilão, nossa oferta firme é:\n\n`;
-            script += `1️⃣ *Nós pagamos:* O boleto de quitação de ${formatCurrency(quitacao)} direto ao Banco.\n`;
-            script += `2️⃣ *Nós assumimos:* Débitos de IPVA/Multas e custos de cartório.\n`;
-            script += `3️⃣ *Você recebe:* *${formatCurrency(tetoPagamentoCliente)}* no PIX no ato da assinatura em cartório.\n\n`;
-            script += `Você sai da dívida total de ${formatCurrency(quitacao + debitos)} e ainda leva dinheiro.\n`;
-            script += `Podemos agendar no cartório amanhã?`;
-            
-            document.getElementById('whatsappText').value = script;
+            document.getElementById('textoZap').value = texto;
 
         } else {
-            // Cenário Inviável
-            statusBadge.className = 'status-badge status-red';
-            statusBadge.innerText = '⛔ NEGÓCIO DE ALTO RISCO';
-            whatsappSec.style.display = 'none';
-            alertSec.style.display = 'block';
-            document.getElementById('resOferta').innerText = "R$ 0,00 (Negativo)";
+            // Cenário Negativo
+            elStatus.innerText = "⛔ INVIÁVEL (Dívida maior que o valor)";
+            elStatus.className = "status inviavel";
+            elOferta.innerText = "R$ 0,00 (Negativo: " + formatarMoeda(ofertaCliente) + ")";
+            elOferta.style.color = "#dc2626"; // Vermelho
+            areaZap.style.display = "none";
         }
     }
 
-    function copiarTexto() {
-        let texto = document.getElementById('whatsappText');
+    function copiar() {
+        let texto = document.getElementById('textoZap');
         texto.select();
-        document.execCommand('copy');
-        alert("Texto copiado! Cole no WhatsApp.");
+        texto.setSelectionRange(0, 99999); /* Mobile */
+        navigator.clipboard.writeText(texto.value);
+        alert("Texto copiado!");
     }
 </script>
 
 </body>
 </html>
-
