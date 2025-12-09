@@ -1,155 +1,342 @@
-import locale
-
-# Configuração para formatação de moeda (BRL)
-try:
-    locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
-except:
-    # Fallback caso o ambiente não tenha pt_BR
-    pass
-
-def formatar_moeda(valor):
-    """Formata valores numéricos para o padrão de moeda brasileiro."""
-    try:
-        return locale.currency(valor, grouping=True)
-    except:
-        return f"R$ {valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
-
-class AnaliseCompraVeiculo:
-    def __init__(self, veiculo, fipe, quitacao_total, debitos_detran=0, reparos_estimados=0, margem_lucro_minima=0.15):
-        """
-        Inicializa os dados da negociação.
-        
-        :param veiculo: Modelo/Ano do carro (ex: "Honda Civic 2020")
-        :param fipe: Valor de Tabela FIPE atual
-        :param quitacao_total: Valor do boleto para quitação à vista (hoje)
-        :param debitos_detran: IPVA, Multas, Licenciamento atrasado
-        :param reparos_estimados: Funilaria, mecânica, pneus
-        :param margem_lucro_minima: % de lucro desejado sobre a FIPE (padrão 15%)
-        """
-        self.veiculo = veiculo
-        self.fipe = fipe
-        self.quitacao = quitacao_total
-        self.debitos = debitos_detran
-        self.reparos = reparos_estimados
-        self.margem_minima = margem_lucro_minima
-        
-        # Custos Fixos Operacionais (Cartório, Despachante, Combustível, Vistoria)
-        self.custo_operacional_fixo = 1500.00 
-        
-        # Fator de Venda Rápida (Deságio para girar rápido abaixo da FIPE)
-        self.fator_venda_rapida = 0.90  # Vender a 90% da FIPE
-
-    def calcular_viabilidade(self):
-        """Realiza o cálculo reverso para encontrar o valor máximo a pagar ao lead."""
-        
-        # 1. Valor Real de Venda (Liquidez)
-        valor_venda_projetado = self.fipe * self.fator_venda_rapida
-        
-        # 2. Custo Obrigatório para "Limpar" o Carro
-        custo_desoneracao = self.quitacao + self.debitos
-        
-        # 3. Custos de Preparação e Operação
-        custo_preparacao = self.reparos + self.custo_operacional_fixo
-        
-        # 4. Lucro Mínimo Esperado (Meta)
-        lucro_meta = valor_venda_projetado * self.margem_minima
-        
-        # 5. O que sobra para o dono (Max Offer)
-        # Fórmula: Venda - (Dívida Banco + Débitos + Reparos + Custos Ops + Meu Lucro)
-        teto_pagamento_cliente = valor_venda_projetado - (custo_desoneracao + custo_preparacao + lucro_meta)
-        
-        # Resultados
-        custo_total_projeto = custo_desoneracao + custo_preparacao + max(0, teto_pagamento_cliente)
-        roi_projetado = ((valor_venda_projetado - custo_total_projeto) / custo_total_projeto) * 100
-        
-        return {
-            "status": "VIÁVEL" if teto_pagamento_cliente > 0 else "INVIÁVEL / ARRISCADO",
-            "teto_pagamento": teto_pagamento_cliente,
-            "valor_venda_projetado": valor_venda_projetado,
-            "custo_total": custo_total_projeto,
-            "lucro_projetado": valor_venda_projetado - custo_total_projeto,
-            "roi": roi_projetado
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAVA - Sistema de Análise de Viabilidade</title>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --bg: #f8fafc;
+            --card: #ffffff;
         }
 
-    def gerar_relatorio(self):
-        dados = self.calcular_viabilidade()
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--primary);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+       .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+       .header {
+            background: var(--primary);
+            color: white;
+            padding: 24px;
+            text-align: center;
+        }
+
+       .header h1 { margin: 0; font-size: 1.5rem; }
+       .header p { margin: 8px 0 0; opacity: 0.8; font-size: 0.9rem; }
+
+       .content { padding: 24px; }
+
+       .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+           .grid { grid-template-columns: 1fr; }
+        }
+
+       .form-group { margin-bottom: 16px; }
         
-        print("="*60)
-        print(f"RELATÓRIO DE INTELIGÊNCIA DE COMPRA: {self.veiculo.upper()}")
-        print("="*60)
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+       .btn {
+            display: block;
+            width: 100%;
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 10px;
+        }
+
+       .btn:hover { background: #1d4ed8; }
+
+       .results {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            display: none; /* Hidden by default */
+        }
+
+       .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+       .status-green { background-color: var(--success); }
+       .status-red { background-color: var(--danger); }
+
+       .result-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+       .result-row.highlight {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }
+
+       .whatsapp-box {
+            margin-top: 25px;
+            background: #dcf8c6;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #bbf7d0;
+            position: relative;
+        }
+
+       .whatsapp-title {
+            font-weight: bold;
+            color: #075e54;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            border: 1px solid #a3cfbb;
+            border-radius: 6px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            resize: vertical;
+        }
+
+       .copy-btn {
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 8px;
+        }
         
-        print(f"1. ANÁLISE DE MERCADO")
-        print(f"   Valor FIPE:.............. {formatar_moeda(self.fipe)}")
-        print(f"   Preço Venda Rápida (90%):  {formatar_moeda(dados['valor_venda_projetado'])}")
-        print("-" * 60)
+       .copy-btn:hover { background: #128C7E; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>SAVA 2.0</h1>
+        <p>Sistema de Análise de Viabilidade de Ativos (Automotivo)</p>
+    </div>
+
+    <div class="content">
+        <div class="grid">
+            <div class="form-group">
+                <label>Modelo do Veículo</label>
+                <input type="text" id="veiculo" placeholder="Ex: Honda Civic 2020">
+            </div>
+            <div class="form-group">
+                <label>Valor FIPE (R$)</label>
+                <input type="number" id="fipe" placeholder="0.00">
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="form-group">
+                <label>Valor Quitação Total (R$)</label>
+                <input type="number" id="quitacao" placeholder="Valor do boleto hoje">
+            </div>
+            <div class="form-group">
+                <label>Débitos DETRAN (IPVA/Multas)</label>
+                <input type="number" id="debitos" placeholder="0.00">
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="form-group">
+                <label>Reparos Necessários (R$)</label>
+                <input type="number" id="reparos" placeholder="Mecânica, Pneus, Funilaria">
+            </div>
+            <div class="form-group">
+                <label>Margem de Lucro Desejada (%)</label>
+                <input type="number" id="margem" value="15" placeholder="15">
+            </div>
+        </div>
+
+        <button class="btn" onclick="calcularViabilidade()">ANALISAR VIABILIDADE</button>
+
+        <div id="resultsArea" class="results">
+            <div id="statusBadge" class="status-badge"></div>
+            
+            <div class="result-row">
+                <span>Venda Projetada (90% FIPE):</span>
+                <span id="resVenda">R$ 0,00</span>
+            </div>
+            <div class="result-row">
+                <span>Custo Total (Quitação + Débitos + Reparos + Taxas):</span>
+                <span id="resCusto">R$ 0,00</span>
+            </div>
+            <div class="result-row">
+                <span>Seu Lucro Projetado:</span>
+                <span id="resLucro" style="color: var(--success); font-weight: bold;">R$ 0,00</span>
+            </div>
+            <div class="result-row highlight">
+                <span>OFERTA MÁXIMA AO CLIENTE:</span>
+                <span id="resOferta">R$ 0,00</span>
+            </div>
+
+            <div id="whatsappSection" class="whatsapp-box">
+                <span class="whatsapp-title">📱 Script de Proposta para WhatsApp</span>
+                <textarea id="whatsappText" readonly></textarea>
+                <button class="copy-btn" onclick="copiarTexto()">Copiar Texto</button>
+            </div>
+            
+            <div id="alertSection" style="margin-top: 15px; color: var(--danger); font-weight: bold; display: none;">
+                ⚠️ OPERAÇÃO DE RISCO: O passivo supera o valor de mercado. Não compre este carro a menos que o cliente pague a diferença.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Configurações Fixas
+    const CUSTO_OPERACIONAL = 1500.00; // Cartório, Despachante, Vistoria
+    const FATOR_VENDA_RAPIDA = 0.90;   // Vender a 90% da FIPE para girar rápido
+
+    function formatCurrency(value) {
+        return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function calcularViabilidade() {
+        // Coleta de dados
+        let veiculo = document.getElementById('veiculo').value |
+
+| "Veículo";
+        let fipe = parseFloat(document.getElementById('fipe').value) |
+
+| 0;
+        let quitacao = parseFloat(document.getElementById('quitacao').value) |
+
+| 0;
+        let debitos = parseFloat(document.getElementById('debitos').value) |
+
+| 0;
+        let reparos = parseFloat(document.getElementById('reparos').value) |
+
+| 0;
+        let margemPerc = parseFloat(document.getElementById('margem').value) |
+
+| 15;
+
+        // Cálculos (Matemática Reversa)
+        let valorVendaProjetado = fipe * FATOR_VENDA_RAPIDA;
+        let lucroMeta = valorVendaProjetado * (margemPerc / 100);
+        let custosFixos = quitacao + debitos + reparos + CUSTO_OPERACIONAL;
         
-        print(f"2. PASSIVO E CUSTOS")
-        print(f"   Quitação Bancária:....... {formatar_moeda(self.quitacao)} (Pago direto ao Banco)")
-        print(f"   Débitos Detran:.......... {formatar_moeda(self.debitos)}")
-        print(f"   Reparos/Prep:............ {formatar_moeda(self.reparos)}")
-        print(f"   Custos Adm/Cartório:..... {formatar_moeda(self.custo_operacional_fixo)}")
-        print("-" * 60)
+        // A mágica: Quanto sobra pro cliente depois de eu tirar meu lucro e pagar tudo?
+        let tetoPagamentoCliente = valorVendaProjetado - (custosFixos + lucroMeta);
+
+        // Exibição
+        document.getElementById('resultsArea').style.display = 'block';
         
-        print(f"3. RESULTADO DA ANÁLISE")
-        if dados['teto_pagamento'] > 0:
-            print(f"   ✅ STATUS: {dados['status']}")
-            print(f"   💰 OFERTA SUGERIDA AO CLIENTE: {formatar_moeda(dados['teto_pagamento'])}")
-            print(f"   📈 Lucro Estimado: {formatar_moeda(dados['lucro_projetado'])} (ROI: {dados['roi']:.1f}%)")
-        else:
-            print(f"   ⛔ STATUS: {dados['status']}")
-            print(f"   Motivo: O passivo supera o valor de mercado considerando custos e margem.")
-            print(f"   Déficit: {formatar_moeda(dados['teto_pagamento'])}")
-            print("   Sugestão: Somente aceitar se o cliente pagar para entregar ou assumir dívida sem custo.")
-        print("="*60)
-        print("\n")
-        
-        return dados
+        let statusBadge = document.getElementById('statusBadge');
+        let whatsappSec = document.getElementById('whatsappSection');
+        let alertSec = document.getElementById('alertSection');
 
-    def gerar_proposta_whatsapp(self, nome_cliente):
-        dados = self.calcular_viabilidade()
-        
-        if dados['teto_pagamento'] <= 0:
-            return "⚠️ Proposta não gerada. O negócio não dá lucro. Abortar operação."
+        // Popula valores na tela
+        document.getElementById('resVenda').innerText = formatCurrency(valorVendaProjetado);
+        document.getElementById('resCusto').innerText = formatCurrency(custosFixos + CUSTO_OPERACIONAL); // Apenas visual
+        document.getElementById('resLucro').innerText = formatCurrency(lucroMeta);
+        document.getElementById('resOferta').innerText = formatCurrency(tetoPagamentoCliente);
 
-        # Script Persuasivo baseado nos dados reais
-        msg = f"""
-*PROPOSTA FORMAL DE COMPRA - {self.veiculo.upper()}*
+        if (tetoPagamentoCliente > 0) {
+            // Cenário Viável
+            statusBadge.className = 'status-badge status-green';
+            statusBadge.innerText = '✅ NEGÓCIO VIÁVEL';
+            whatsappSec.style.display = 'block';
+            alertSec.style.display = 'none';
+            
+            // Gera Texto
+            let script = `*PROPOSTA DE COMPRA - ${veiculo.toUpperCase()}*\n\n`;
+            script += `Olá! Fizemos a análise jurídica e financeira do seu caso.\n\n`;
+            script += `Para resolvermos a pendência no banco *hoje* e evitar o leilão, nossa oferta firme é:\n\n`;
+            script += `1️⃣ *Nós pagamos:* O boleto de quitação de ${formatCurrency(quitacao)} direto ao Banco.\n`;
+            script += `2️⃣ *Nós assumimos:* Débitos de IPVA/Multas e custos de cartório.\n`;
+            script += `3️⃣ *Você recebe:* *${formatCurrency(tetoPagamentoCliente)}* no PIX no ato da assinatura em cartório.\n\n`;
+            script += `Você sai da dívida total de ${formatCurrency(quitacao + debitos)} e ainda leva dinheiro.\n`;
+            script += `Podemos agendar no cartório amanhã?`;
+            
+            document.getElementById('whatsappText').value = script;
 
-Olá, {nome_cliente}. Fizemos a análise detalhada do seu caso junto ao jurídico e financeiro.
+        } else {
+            // Cenário Inviável
+            statusBadge.className = 'status-badge status-red';
+            statusBadge.innerText = '⛔ NEGÓCIO DE ALTO RISCO';
+            whatsappSec.style.display = 'none';
+            alertSec.style.display = 'block';
+            document.getElementById('resOferta').innerText = "R$ 0,00 (Negativo)";
+        }
+    }
 
-Para resolvermos sua situação *hoje*, quitar sua dívida no banco e evitar/encerrar o processo judicial, conseguimos aprovar a seguinte operação:
+    function copiarTexto() {
+        let texto = document.getElementById('whatsappText');
+        texto.select();
+        document.execCommand('copy');
+        alert("Texto copiado! Cole no WhatsApp.");
+    }
+</script>
 
-1️⃣ *Quitação Integral:* Nós pagaremos à vista o boleto de {formatar_moeda(self.quitacao)} diretamente ao Banco.
-2️⃣ *Regularização:* Assumiremos os débitos de IPVA/Multas ({formatar_moeda(self.debitos)}) e os custos de transferência.
-3️⃣ *Seu "Troco":* Além de limpar seu nome do financiamento, te pagaremos *{formatar_moeda(dados['teto_pagamento'])}* no PIX no ato da assinatura em cartório.
+</body>
+</html>
 
-*Resumo:* Você se livra de uma dívida total de {formatar_moeda(self.quitacao + self.debitos)} e ainda sai com dinheiro no bolso.
-
-Podemos agendar no cartório para amanhã? Essa proposta é válida por 24h devido ao cálculo do boleto bancário.
-"""
-        print("--- COPIE O TEXTO ABAIXO PARA O WHATSAPP ---")
-        print(msg)
-        print("--------------------------------------------")
-
-# ==========================================
-# ÁREA DE SIMULAÇÃO (PREENCHA AQUI SEUS DADOS)
-# ==========================================
-
-# Exemplo: Jeep Compass Longitude 2018
-# Cenário: Cliente deve 48x, mas quitação é 85k. Carro tem 3k de IPVA e precisa de 2k de pneus.
-
-analise = AnaliseCompraVeiculo(
-    veiculo="Jeep Compass 2018",
-    fipe=110000.00,          # Valor de Tabela
-    quitacao_total=75000.00, # Valor que o banco pede para quitar HOJE (não a soma das parcelas)
-    debitos_detran=3500.00,  # IPVA, Licenciamento, Multas
-    reparos_estimados=2000.00, # Pneus, martelinho, polimento
-    margem_lucro_minima=0.15   # Quero ganhar pelo menos 15% sobre a venda
-)
-
-# Executa o sistema
-dados_finais = analise.gerar_relatorio()
-
-# Se deu bom, gera o texto pro cliente
-if dados_finais['teto_pagamento'] > 0:
-    analise.gerar_proposta_whatsapp(nome_cliente="Carlos")
