@@ -1,0 +1,155 @@
+import locale
+
+# Configuração para formatação de moeda (BRL)
+try:
+    locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+except:
+    # Fallback caso o ambiente não tenha pt_BR
+    pass
+
+def formatar_moeda(valor):
+    """Formata valores numéricos para o padrão de moeda brasileiro."""
+    try:
+        return locale.currency(valor, grouping=True)
+    except:
+        return f"R$ {valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
+class AnaliseCompraVeiculo:
+    def __init__(self, veiculo, fipe, quitacao_total, debitos_detran=0, reparos_estimados=0, margem_lucro_minima=0.15):
+        """
+        Inicializa os dados da negociação.
+        
+        :param veiculo: Modelo/Ano do carro (ex: "Honda Civic 2020")
+        :param fipe: Valor de Tabela FIPE atual
+        :param quitacao_total: Valor do boleto para quitação à vista (hoje)
+        :param debitos_detran: IPVA, Multas, Licenciamento atrasado
+        :param reparos_estimados: Funilaria, mecânica, pneus
+        :param margem_lucro_minima: % de lucro desejado sobre a FIPE (padrão 15%)
+        """
+        self.veiculo = veiculo
+        self.fipe = fipe
+        self.quitacao = quitacao_total
+        self.debitos = debitos_detran
+        self.reparos = reparos_estimados
+        self.margem_minima = margem_lucro_minima
+        
+        # Custos Fixos Operacionais (Cartório, Despachante, Combustível, Vistoria)
+        self.custo_operacional_fixo = 1500.00 
+        
+        # Fator de Venda Rápida (Deságio para girar rápido abaixo da FIPE)
+        self.fator_venda_rapida = 0.90  # Vender a 90% da FIPE
+
+    def calcular_viabilidade(self):
+        """Realiza o cálculo reverso para encontrar o valor máximo a pagar ao lead."""
+        
+        # 1. Valor Real de Venda (Liquidez)
+        valor_venda_projetado = self.fipe * self.fator_venda_rapida
+        
+        # 2. Custo Obrigatório para "Limpar" o Carro
+        custo_desoneracao = self.quitacao + self.debitos
+        
+        # 3. Custos de Preparação e Operação
+        custo_preparacao = self.reparos + self.custo_operacional_fixo
+        
+        # 4. Lucro Mínimo Esperado (Meta)
+        lucro_meta = valor_venda_projetado * self.margem_minima
+        
+        # 5. O que sobra para o dono (Max Offer)
+        # Fórmula: Venda - (Dívida Banco + Débitos + Reparos + Custos Ops + Meu Lucro)
+        teto_pagamento_cliente = valor_venda_projetado - (custo_desoneracao + custo_preparacao + lucro_meta)
+        
+        # Resultados
+        custo_total_projeto = custo_desoneracao + custo_preparacao + max(0, teto_pagamento_cliente)
+        roi_projetado = ((valor_venda_projetado - custo_total_projeto) / custo_total_projeto) * 100
+        
+        return {
+            "status": "VIÁVEL" if teto_pagamento_cliente > 0 else "INVIÁVEL / ARRISCADO",
+            "teto_pagamento": teto_pagamento_cliente,
+            "valor_venda_projetado": valor_venda_projetado,
+            "custo_total": custo_total_projeto,
+            "lucro_projetado": valor_venda_projetado - custo_total_projeto,
+            "roi": roi_projetado
+        }
+
+    def gerar_relatorio(self):
+        dados = self.calcular_viabilidade()
+        
+        print("="*60)
+        print(f"RELATÓRIO DE INTELIGÊNCIA DE COMPRA: {self.veiculo.upper()}")
+        print("="*60)
+        
+        print(f"1. ANÁLISE DE MERCADO")
+        print(f"   Valor FIPE:.............. {formatar_moeda(self.fipe)}")
+        print(f"   Preço Venda Rápida (90%):  {formatar_moeda(dados['valor_venda_projetado'])}")
+        print("-" * 60)
+        
+        print(f"2. PASSIVO E CUSTOS")
+        print(f"   Quitação Bancária:....... {formatar_moeda(self.quitacao)} (Pago direto ao Banco)")
+        print(f"   Débitos Detran:.......... {formatar_moeda(self.debitos)}")
+        print(f"   Reparos/Prep:............ {formatar_moeda(self.reparos)}")
+        print(f"   Custos Adm/Cartório:..... {formatar_moeda(self.custo_operacional_fixo)}")
+        print("-" * 60)
+        
+        print(f"3. RESULTADO DA ANÁLISE")
+        if dados['teto_pagamento'] > 0:
+            print(f"   ✅ STATUS: {dados['status']}")
+            print(f"   💰 OFERTA SUGERIDA AO CLIENTE: {formatar_moeda(dados['teto_pagamento'])}")
+            print(f"   📈 Lucro Estimado: {formatar_moeda(dados['lucro_projetado'])} (ROI: {dados['roi']:.1f}%)")
+        else:
+            print(f"   ⛔ STATUS: {dados['status']}")
+            print(f"   Motivo: O passivo supera o valor de mercado considerando custos e margem.")
+            print(f"   Déficit: {formatar_moeda(dados['teto_pagamento'])}")
+            print("   Sugestão: Somente aceitar se o cliente pagar para entregar ou assumir dívida sem custo.")
+        print("="*60)
+        print("\n")
+        
+        return dados
+
+    def gerar_proposta_whatsapp(self, nome_cliente):
+        dados = self.calcular_viabilidade()
+        
+        if dados['teto_pagamento'] <= 0:
+            return "⚠️ Proposta não gerada. O negócio não dá lucro. Abortar operação."
+
+        # Script Persuasivo baseado nos dados reais
+        msg = f"""
+*PROPOSTA FORMAL DE COMPRA - {self.veiculo.upper()}*
+
+Olá, {nome_cliente}. Fizemos a análise detalhada do seu caso junto ao jurídico e financeiro.
+
+Para resolvermos sua situação *hoje*, quitar sua dívida no banco e evitar/encerrar o processo judicial, conseguimos aprovar a seguinte operação:
+
+1️⃣ *Quitação Integral:* Nós pagaremos à vista o boleto de {formatar_moeda(self.quitacao)} diretamente ao Banco.
+2️⃣ *Regularização:* Assumiremos os débitos de IPVA/Multas ({formatar_moeda(self.debitos)}) e os custos de transferência.
+3️⃣ *Seu "Troco":* Além de limpar seu nome do financiamento, te pagaremos *{formatar_moeda(dados['teto_pagamento'])}* no PIX no ato da assinatura em cartório.
+
+*Resumo:* Você se livra de uma dívida total de {formatar_moeda(self.quitacao + self.debitos)} e ainda sai com dinheiro no bolso.
+
+Podemos agendar no cartório para amanhã? Essa proposta é válida por 24h devido ao cálculo do boleto bancário.
+"""
+        print("--- COPIE O TEXTO ABAIXO PARA O WHATSAPP ---")
+        print(msg)
+        print("--------------------------------------------")
+
+# ==========================================
+# ÁREA DE SIMULAÇÃO (PREENCHA AQUI SEUS DADOS)
+# ==========================================
+
+# Exemplo: Jeep Compass Longitude 2018
+# Cenário: Cliente deve 48x, mas quitação é 85k. Carro tem 3k de IPVA e precisa de 2k de pneus.
+
+analise = AnaliseCompraVeiculo(
+    veiculo="Jeep Compass 2018",
+    fipe=110000.00,          # Valor de Tabela
+    quitacao_total=75000.00, # Valor que o banco pede para quitar HOJE (não a soma das parcelas)
+    debitos_detran=3500.00,  # IPVA, Licenciamento, Multas
+    reparos_estimados=2000.00, # Pneus, martelinho, polimento
+    margem_lucro_minima=0.15   # Quero ganhar pelo menos 15% sobre a venda
+)
+
+# Executa o sistema
+dados_finais = analise.gerar_relatorio()
+
+# Se deu bom, gera o texto pro cliente
+if dados_finais['teto_pagamento'] > 0:
+    analise.gerar_proposta_whatsapp(nome_cliente="Carlos")
